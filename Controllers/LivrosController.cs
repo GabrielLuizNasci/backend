@@ -24,7 +24,21 @@ namespace backend.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Livro>>> GetLivros()
         {
-            return await _context.Livros.ToListAsync();
+            var livros = await _context.Livros
+            .Include(l => l.Editora)
+            .Select(l => new
+            {
+                l.Id,
+                l.Nome,
+                l.Descricao,
+                l.Edicao,
+                l.Lancamento,
+                l.EditoraId,
+                NomeEditora = l.Editora != null ? l.Editora.Nome : null
+            })
+            .ToListAsync();
+
+            return Ok(livros);
         }
 
         // GET: api/Livros/5
